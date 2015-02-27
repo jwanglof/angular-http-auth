@@ -1,0 +1,19 @@
+{
+  "name": "angular-http-auth",
+  "version": "1.2.1",
+  "description": "HTTP auth interceptor angular module.",
+  "main": "src/http-auth-interceptor.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twalling/angular-http-auth.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/twalling/angular-http-auth/issues"
+  },
+  "homepage": "https://github.com/twalling/angular-http-auth"
+}
