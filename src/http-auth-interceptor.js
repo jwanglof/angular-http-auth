@@ -62,6 +62,9 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
                 httpBuffer.append(rejection.config, deferred);
                 $rootScope.$broadcast('event:auth-loginRequired', rejection);
                 return deferred.promise;
+              case 402:
+                $rootScope.$broadcast('event:auth-paymentRequired', rejection);
+                break;
               case 403:
                 $rootScope.$broadcast('event:auth-forbidden', rejection);
                 break;
