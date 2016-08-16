@@ -21,7 +21,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
        * retry of all deferred requests.
        * @param data an optional argument to pass on to $broadcast which may be useful for
        * example if you need to pass through details of the user that was logged in
-       * @param configUpdater an optional transformation function that can modify the                                                                                                                                                   
+       * @param configUpdater an optional transformation function that can modify the
        * requests that are retried after having logged in.  This can be used for example
        * to add an authentication token.  It must return the request.
        */
@@ -55,12 +55,14 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
     $httpProvider.interceptors.push(['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
       return {
         responseError: function(rejection) {
-          if (!rejection.config.ignoreAuthModule) {
+          var config = rejection.config || {};
+          if (!config.ignoreAuthModule) {
             switch (rejection.status) {
               case 401:
                 var deferred = $q.defer();
-                httpBuffer.append(rejection.config, deferred);
-                $rootScope.$broadcast('event:auth-loginRequired', rejection);
+                var bufferLength = httpBuffer.append(config, deferred);
+                if (bufferLength === 1)
+                  $rootScope.$broadcast('event:auth-loginRequired', rejection);
                 return deferred.promise;
               case 402:
                 $rootScope.$broadcast('event:auth-paymentRequired', rejection);
@@ -103,9 +105,10 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
     return {
       /**
        * Appends HTTP request configuration object with deferred response attached to buffer.
+       * @return {Number} The new length of the buffer.
        */
       append: function(config, deferred) {
-        buffer.push({
+        return buffer.push({
           config: config,
           deferred: deferred
         });
@@ -128,7 +131,9 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
        */
       retryAll: function(updater) {
         for (var i = 0; i < buffer.length; ++i) {
-          retryHttpRequest(updater(buffer[i].config), buffer[i].deferred);
+          var _cfg = updater(buffer[i].config);
+          if (_cfg !== false)
+            retryHttpRequest(_cfg, buffer[i].deferred);
         }
         buffer = [];
       }
